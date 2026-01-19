@@ -1,23 +1,27 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Layout } from './Layout';
-export const ProtectedRoute: React.FC<{
-  children: React.ReactNode;
-}> = ({
-  children
-}) => {
+import { Loader } from './Loader';
+import { Navbar } from './Navbar';
+export function ProtectedRoute() {
   const {
-    user,
-    loading
+    isAuthenticated,
+    isLoading
   } = useAuth();
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center">
+        <Loader />
       </div>;
   }
-  if (!user) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-  return <Layout>{children}</Layout>;
-};
+  return <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <main className="pt-16 pb-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Outlet />
+        </div>
+      </main>
+    </div>;
+}

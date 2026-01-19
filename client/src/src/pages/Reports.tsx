@@ -1,210 +1,109 @@
-import React, { useEffect, useState } from 'react';
-import api from '../services/api';
-import { Car, BillData, DailyReportData } from '../types';
-import { Button } from '../components/ui/Button';
-import { Select } from '../components/ui/Select';
-import { Input } from '../components/ui/Input';
-import { Table, TableRow, TableCell } from '../components/ui/Table';
-import { formatCurrency, formatDate, formatDateForInput } from '../utils/formatters';
-import { Printer } from 'lucide-react';
-export const Reports = () => {
-  const [activeTab, setActiveTab] = useState<'bill' | 'daily'>('bill');
-  const [cars, setCars] = useState<Car[]>([]);
-  // Bill State
-  const [selectedPlate, setSelectedPlate] = useState('');
-  const [billData, setBillData] = useState<BillData | null>(null);
-  // Daily Report State
-  const [reportDate, setReportDate] = useState(formatDateForInput(new Date().toISOString()));
-  const [dailyReport, setDailyReport] = useState<DailyReportData | null>(null);
-  useEffect(() => {
-    const fetchCars = async () => {
-      const res = await api.get('/cars');
-      setCars(res.data);
-    };
-    fetchCars();
-  }, []);
-  const generateBill = async () => {
-    if (!selectedPlate) return;
+import React, { useState, createElement } from 'react';
+import { Download, FileText, Calendar } from 'lucide-react';
+import { downloadMonthlyReport } from '../api/reports';
+import { Button } from '../components/Button';
+import { Input } from '../components/Input';
+import { useToast } from '../components/Toast';
+export function Reports() {
+  const [month, setMonth] = useState(new Date().getMonth() + 1);
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [isLoading, setIsLoading] = useState(false);
+  const {
+    showToast
+  } = useToast();
+  const handleDownload = async () => {
+    setIsLoading(true);
     try {
-      const res = await api.get(`/reports/bill/${selectedPlate}`);
-      setBillData(res.data);
-    } catch (err) {
-      console.error('Error generating bill');
+      const blob = await downloadMonthlyReport(month, year);
+      // Check if blob is valid (sometimes errors return as JSON blobs)
+      if (blob.type === 'application/json') {
+        throw new Error('Failed to generate report');
+      }
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Monthly_Report_${month}-${year}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      showToast('Report downloaded successfully', 'success');
+    } catch (error) {
+      console.error('Failed to download report', error);
+      showToast('Failed to download report. Please try again.', 'error');
+    } finally {
+      setIsLoading(false);
     }
   };
-  const generateDailyReport = async () => {
-    try {
-      const res = await api.get(`/reports/daily?date=${reportDate}`);
-      setDailyReport(res.data);
-    } catch (err) {
-      console.error('Error generating daily report');
-    }
-  };
-  const handlePrint = () => {
-    window.print();
-  };
-  return <div className="space-y-8">
-      <div className="flex justify-between items-center print:hidden">
-        <h1 className="text-2xl font-bold text-gray-900">Reports & Billing</h1>
-        <div className="flex space-x-2">
-          <Button variant={activeTab === 'bill' ? 'primary' : 'outline'} onClick={() => setActiveTab('bill')}>
-            Bill Generator
-          </Button>
-          <Button variant={activeTab === 'daily' ? 'primary' : 'outline'} onClick={() => setActiveTab('daily')}>
-            Daily Report
-          </Button>
-        </div>
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  return <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+          Reports
+        </h1>
+        <p className="text-sm text-gray-500 mt-1">
+          Generate and download financial reports.
+        </p>
       </div>
 
-      {/* Bill Generator Section */}
-      {activeTab === 'bill' && <div className="space-y-6">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 print:hidden">
-            <div className="flex items-end gap-4">
-              <div className="flex-1">
-                <Select label="Select Car for Bill" options={cars.map(c => ({
-              value: c.PlateNumber,
-              label: `${c.PlateNumber} - ${c.Model}`
-            }))} value={selectedPlate} onChange={e => setSelectedPlate(e.target.value)} />
-              </div>
-              <Button onClick={generateBill} disabled={!selectedPlate}>
-                Generate Bill
-              </Button>
+      <div className="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden max-w-2xl">
+        <div className="p-6 border-b border-gray-100 bg-gray-50/50">
+          <div className="flex items-center">
+            <div className="p-3 rounded-lg bg-blue-100 text-blue-600 mr-4 shadow-sm">
+              <FileText className="w-6 h-6" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">
+                Monthly Financial Report
+              </h2>
+              <p className="text-sm text-gray-500">
+                Download a detailed PDF report of all services and payments for
+                a specific month.
+              </p>
             </div>
           </div>
+        </div>
 
-          {billData && <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 max-w-3xl mx-auto print:shadow-none print:border-none">
-              <div className="text-center border-b pb-6 mb-6">
-                <h2 className="text-3xl font-bold text-gray-900">
-                  SmartPark CRPMS
-                </h2>
-                <p className="text-gray-500">
-                  Rubavu District, Western Province
-                </p>
-                <h3 className="text-xl font-semibold mt-4">OFFICIAL INVOICE</h3>
-              </div>
-
-              <div className="grid grid-cols-2 gap-8 mb-8">
-                <div>
-                  <h4 className="text-sm font-bold text-gray-500 uppercase">
-                    Customer Details
-                  </h4>
-                  <p className="font-semibold">{billData.car.PlateNumber}</p>
-                  <p>
-                    {billData.car.Model} ({billData.car.Type})
-                  </p>
-                  <p>{billData.car.DriverPhone}</p>
-                </div>
-                <div className="text-right">
-                  <h4 className="text-sm font-bold text-gray-500 uppercase">
-                    Date
-                  </h4>
-                  <p>{new Date().toLocaleDateString()}</p>
+        <div className="p-6 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="w-full">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Month
+              </label>
+              <div className="relative">
+                <select className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md shadow-sm bg-white" value={month} onChange={e => setMonth(parseInt(e.target.value))}>
+                  {months.map((m, i) => <option key={i + 1} value={i + 1}>
+                      {m}
+                    </option>)}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                  <Calendar className="h-4 w-4 text-gray-400" />
                 </div>
               </div>
-
-              <table className="w-full mb-8">
-                <thead>
-                  <tr className="border-b-2 border-gray-800">
-                    <th className="text-left py-2">Service Description</th>
-                    <th className="text-left py-2">Date</th>
-                    <th className="text-right py-2">Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {billData.services.map((s, i) => <tr key={i} className="border-b border-gray-200">
-                      <td className="py-2">{s.ServiceName}</td>
-                      <td className="py-2">{formatDate(s.ServiceDate)}</td>
-                      <td className="py-2 text-right">
-                        {formatCurrency(s.ServicePrice)}
-                      </td>
-                    </tr>)}
-                </tbody>
-              </table>
-
-              <div className="border-t-2 border-gray-800 pt-4 space-y-2">
-                <div className="flex justify-between">
-                  <span>Total Service Cost:</span>
-                  <span className="font-bold">
-                    {formatCurrency(billData.summary.totalServiceCost)}
-                  </span>
-                </div>
-                <div className="flex justify-between text-green-600">
-                  <span>Amount Paid:</span>
-                  <span className="font-bold">
-                    -{formatCurrency(billData.summary.totalPaid)}
-                  </span>
-                </div>
-                <div className="flex justify-between text-xl font-bold border-t pt-2 mt-2">
-                  <span>Balance Due:</span>
-                  <span className={billData.summary.balance > 0 ? 'text-red-600' : 'text-gray-900'}>
-                    {formatCurrency(billData.summary.balance)}
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-12 pt-8 border-t text-center text-sm text-gray-500 print:hidden">
-                <Button onClick={handlePrint} variant="secondary" className="mx-auto">
-                  <Printer className="mr-2 h-4 w-4" /> Print Invoice
-                </Button>
-              </div>
-            </div>}
-        </div>}
-
-      {/* Daily Report Section */}
-      {activeTab === 'daily' && <div className="space-y-6">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 print:hidden">
-            <div className="flex items-end gap-4">
-              <div className="flex-1">
-                <Input label="Report Date" type="date" value={reportDate} onChange={e => setReportDate(e.target.value)} />
-              </div>
-              <Button onClick={generateDailyReport}>Generate Report</Button>
             </div>
+
+            <Input label="Year" type="number" value={year} onChange={e => setYear(parseInt(e.target.value))} min="2000" max="2100" />
           </div>
 
-          {dailyReport && <div className="space-y-8 print:space-y-4">
-              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h3 className="text-lg font-bold mb-4">
-                  Services Offered on {formatDate(dailyReport.date)}
-                </h3>
-                <Table headers={['Car', 'Service', 'Price']}>
-                  {dailyReport.services.map((s, i) => <TableRow key={i}>
-                      <TableCell>
-                        {s.PlateNumber} ({s.Model})
-                      </TableCell>
-                      <TableCell>{s.ServiceName}</TableCell>
-                      <TableCell>{formatCurrency(s.ServicePrice)}</TableCell>
-                    </TableRow>)}
-                </Table>
-                <div className="mt-4 text-right font-bold">
-                  Total Value:{' '}
-                  {formatCurrency(dailyReport.totals.totalServiceValue)}
-                </div>
-              </div>
+          <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+            <h4 className="text-sm font-medium text-blue-800 mb-1">
+              Report Contents
+            </h4>
+            <ul className="list-disc list-inside text-sm text-blue-700 space-y-1">
+              <li>Total revenue for the selected period</li>
+              <li>Breakdown of services performed</li>
+              <li>Payment status summary</li>
+              <li>Outstanding balances</li>
+            </ul>
+          </div>
 
-              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h3 className="text-lg font-bold mb-4">
-                  Payments Received on {formatDate(dailyReport.date)}
-                </h3>
-                <Table headers={['Car', 'Amount']}>
-                  {dailyReport.payments.map((p, i) => <TableRow key={i}>
-                      <TableCell>
-                        {p.PlateNumber} ({p.Model})
-                      </TableCell>
-                      <TableCell>{formatCurrency(p.AmountPaid)}</TableCell>
-                    </TableRow>)}
-                </Table>
-                <div className="mt-4 text-right font-bold text-green-600">
-                  Total Revenue:{' '}
-                  {formatCurrency(dailyReport.totals.totalRevenue)}
-                </div>
-              </div>
-
-              <div className="text-center print:hidden">
-                <Button onClick={handlePrint} variant="secondary">
-                  <Printer className="mr-2 h-4 w-4" /> Print Report
-                </Button>
-              </div>
-            </div>}
-        </div>}
+          <div className="flex justify-end pt-4 border-t border-gray-100">
+            <Button onClick={handleDownload} isLoading={isLoading} className="w-full sm:w-auto">
+              <Download className="w-4 h-4 mr-2" />
+              Download PDF Report
+            </Button>
+          </div>
+        </div>
+      </div>
     </div>;
-};
+}

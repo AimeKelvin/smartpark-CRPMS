@@ -1,71 +1,45 @@
 export interface User {
-  id: number;
+  id: string;
   username: string;
-  role: string;
+  role?: string;
+}
+export interface AuthResponse {
+  token: string;
+  user?: User;
 }
 export interface Car {
-  PlateNumber: string;
-  Type: string;
-  Model: string;
-  ManufacturingYear: number;
-  DriverPhone: string;
-  MechanicName: string;
+  _id: string;
+  make: string;
+  model: string;
+  year: number;
+  licensePlate: string;
+  owner: string;
 }
 export interface Service {
-  ServiceCode: string;
-  ServiceName: string;
-  ServicePrice: number;
+  _id: string;
+  name: string;
+  description: string;
+  basePrice: number;
 }
 export interface ServiceRecord {
-  RecordNumber: number;
-  ServiceDate: string;
-  PlateNumber: string;
-  ServiceCode: string;
-  // Joined fields
-  Model?: string;
-  DriverPhone?: string;
-  ServiceName?: string;
-  ServicePrice?: number;
+  _id: string;
+  car: Car | string; // Populated or ID
+  service: Service | string; // Populated or ID
+  date: string;
+  status: 'pending' | 'in-progress' | 'completed';
+  notes?: string;
+  cost: number;
 }
 export interface Payment {
-  PaymentNumber: number;
-  AmountPaid: number;
-  PaymentDate: string;
-  PlateNumber: string;
-  // Joined fields
-  Model?: string;
-  DriverPhone?: string;
-}
-export interface BillData {
-  car: Car;
-  services: {
-    ServiceDate: string;
-    ServiceName: string;
-    ServicePrice: number;
-  }[];
-  summary: {
-    totalServiceCost: number;
-    totalPaid: number;
-    balance: number;
-  };
-}
-export interface DailyReportData {
+  _id: string;
+  record: ServiceRecord | string;
+  amount: number;
   date: string;
-  services: {
-    ServiceDate: string;
-    PlateNumber: string;
-    Model: string;
-    ServiceName: string;
-    ServicePrice: number;
-  }[];
-  payments: {
-    PaymentDate: string;
-    AmountPaid: number;
-    PlateNumber: string;
-    Model: string;
-  }[];
-  totals: {
-    totalServiceValue: number;
-    totalRevenue: number;
-  };
+  method: 'cash' | 'credit_card' | 'bank_transfer';
+  status: 'pending' | 'completed' | 'failed';
+}
+export interface DashboardStats {
+  totalCars: number;
+  monthlyPayments: number;
+  pendingRecords: number;
 }

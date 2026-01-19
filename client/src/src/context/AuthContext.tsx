@@ -1,12 +1,12 @@
 import React, { useEffect, useState, createContext, useContext } from 'react';
-import api from '../services/api';
 import { User } from '../types';
 interface AuthContextType {
   user: User | null;
-  loading: boolean;
-  login: (user: User) => void;
-  logout: () => Promise<void>;
-  checkAuth: () => Promise<void>;
+  token: string | null;
+  login: (token: string, user?: User) => void;
+  logout: () => void;
+  isAuthenticated: boolean;
+  isLoading: boolean;
 }
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({
@@ -15,42 +15,34 @@ export const AuthProvider = ({
   children: ReactNode;
 }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const checkAuth = async () => {
-    try {
-      const response = await api.get('/auth/check');
-      if (response.data.isAuthenticated) {
-        setUser(response.data.user);
-      } else {
-        setUser(null);
-      }
-    } catch (error) {
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
-    checkAuth();
-  }, []);
-  const login = (userData: User) => {
-    setUser(userData);
-  };
-  const logout = async () => {
-    try {
-      await api.post('/auth/logout');
-      setUser(null);
-      window.location.href = '/login';
-    } catch (error) {
-      console.error('Logout failed', error);
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) {
+      setToken(storedToken);
+      // Optionally decode token here to get user info if not stored separately
+      // For now, we'll assume the user is authenticated if token exists
     }
+    setIsLoading(false);
+  }, []);
+  const login = (newToken: string, newUser?: User) => {
+    localStorage.setItem('token', newToken);
+    setToken(newToken);
+    if (newUser) setUser(newUser);
+  };
+  const logout = () => {
+    localStorage.removeItem('token');
+    setToken(null);
+    setUser(null);
   };
   return <AuthContext.Provider value={{
     user,
-    loading,
+    token,
     login,
     logout,
-    checkAuth
+    isAuthenticated: !!token,
+    isLoading
   }}>
       {children}
     </AuthContext.Provider>;

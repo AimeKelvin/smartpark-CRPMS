@@ -1,48 +1,38 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './src/context/AuthContext';
+import { ToastProvider } from './src/components/Toast';
+import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { ProtectedRoute } from './src/components/ProtectedRoute';
 import { Login } from './src/pages/Login';
 import { Dashboard } from './src/pages/Dashboard';
-import { CarManagement } from './src/pages/CarManagement';
-import { ServicesManagement } from './src/pages/ServicesManagement';
-import { ServiceRecordManagement } from './src/pages/ServiceRecordManagement';
-import { PaymentManagement } from './src/pages/PaymentManagement';
+import { Cars } from './src/pages/Cars';
+import { Services } from './src/pages/Services';
+import { ServiceRecords } from './src/pages/ServiceRecords';
+import { Payments } from './src/pages/Payments';
 import { Reports } from './src/pages/Reports';
-import { Layout } from './src/components/Layout';
-function App() {
-  return <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
+export function App() {
+  return <ErrorBoundary>
+      <AuthProvider>
+        <ToastProvider>
+          <Router>
+            <Routes>
+              <Route path="/login" element={<Login />} />
 
-          <Route path="/" element={<ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>} />
+              <Route element={<ProtectedRoute />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/cars" element={<Cars />} />
+                <Route path="/services" element={<Services />} />
+                <Route path="/records" element={<ServiceRecords />} />
+                <Route path="/payments" element={<Payments />} />
+                <Route path="/reports" element={<Reports />} />
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              </Route>
 
-          <Route path="/cars" element={<ProtectedRoute>
-                <CarManagement />
-              </ProtectedRoute>} />
-
-          <Route path="/services" element={<ProtectedRoute>
-                <ServicesManagement />
-              </ProtectedRoute>} />
-
-          <Route path="/records" element={<ProtectedRoute>
-                <ServiceRecordManagement />
-              </ProtectedRoute>} />
-
-          <Route path="/payments" element={<ProtectedRoute>
-                <PaymentManagement />
-              </ProtectedRoute>} />
-
-          <Route path="/reports" element={<ProtectedRoute>
-                <Reports />
-              </ProtectedRoute>} />
-
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>;
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </Routes>
+          </Router>
+        </ToastProvider>
+      </AuthProvider>
+    </ErrorBoundary>;
 }
-export { App };
