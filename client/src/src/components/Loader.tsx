@@ -6,6 +6,6 @@ export function Loader({
   className?: string;
 }) {
   return <div className={`flex justify-center items-center p-4 ${className}`}>
-      <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      <Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-400" />
     </div>;
 }

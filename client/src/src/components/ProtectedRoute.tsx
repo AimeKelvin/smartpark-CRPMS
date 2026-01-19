@@ -9,17 +9,17 @@ export function ProtectedRoute() {
     isLoading
   } = useAuth();
   if (isLoading) {
-    return <div className="min-h-screen flex items-center justify-center">
+    return <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <Loader />
       </div>;
   }
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-  return <div className="min-h-screen bg-gray-50">
+  return <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       <Navbar />
       <main className="pt-16 pb-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
           <Outlet />
         </div>
       </main>

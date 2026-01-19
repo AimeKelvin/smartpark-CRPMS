@@ -7,36 +7,35 @@ export interface AuthResponse {
   token: string;
   user?: User;
 }
+
+// Car model matches your backend schema
 export interface Car {
   _id: string;
-  make: string;
-  model: string;
-  year: number;
-  licensePlate: string;
-  owner: string;
+  plateNumber: string; // matches Mongoose field
+  type?: string;
+  model?: string;
+  year?: number;
+  driverPhone?: string;
+  mechanicName?: string;
 }
 export interface Service {
   _id: string;
+  code: string;
   name: string;
-  description: string;
-  basePrice: number;
+  price: number;
 }
 export interface ServiceRecord {
   _id: string;
-  car: Car | string; // Populated or ID
-  service: Service | string; // Populated or ID
-  date: string;
-  status: 'pending' | 'in-progress' | 'completed';
-  notes?: string;
-  cost: number;
+  car: Car | string; // Populated object or ObjectId
+  service: Service | string; // Populated object or ObjectId
+  serviceDate: string; // matches backend
+  status: 'pending' | 'in_progress' | 'completed';
 }
 export interface Payment {
   _id: string;
-  record: ServiceRecord | string;
-  amount: number;
-  date: string;
-  method: 'cash' | 'credit_card' | 'bank_transfer';
-  status: 'pending' | 'completed' | 'failed';
+  record: ServiceRecord | string; // Populated or ID
+  amountPaid: number; // matches backend
+  paymentDate: string;
 }
 export interface DashboardStats {
   totalCars: number;

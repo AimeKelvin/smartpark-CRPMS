@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, Car, Wrench, ClipboardList, CreditCard, FileText, LogOut, Menu, X } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+import { LayoutDashboard, Car, Wrench, ClipboardList, CreditCard, FileText, LogOut, Menu, X, Moon, Sun } from 'lucide-react';
 export function Navbar() {
   const {
     logout
   } = useAuth();
+  const {
+    theme,
+    toggleTheme
+  } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -39,30 +44,44 @@ export function Navbar() {
     icon: FileText
   }];
   const isActive = (path: string) => location.pathname === path;
-  return <nav className="bg-white shadow-sm border-b border-gray-200 fixed w-full top-0 z-40">
+  return <nav className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-800 fixed w-full top-0 z-40 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <span className="text-xl font-bold text-blue-600">CRPMS</span>
+              <div className="flex items-center space-x-2">
+                <div className="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center">
+                  <Wrench className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-xl font-bold text-gray-900 dark:text-white hidden sm:block">
+                  CRPMS
+                </span>
+              </div>
             </div>
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-4">
-              {navItems.map(item => <Link key={item.path} to={item.path} className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${isActive(item.path) ? 'border-blue-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}`}>
+            <div className="hidden md:ml-6 md:flex md:space-x-1">
+              {navItems.map(item => <Link key={item.path} to={item.path} className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${isActive(item.path) ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'}`}>
                   <item.icon className="w-4 h-4 mr-2" />
-                  {item.name}
+                  <span className="hidden lg:inline">{item.name}</span>
                 </Link>)}
             </div>
           </div>
-          <div className="hidden sm:ml-6 sm:flex sm:items-center">
-            <button onClick={handleLogout} className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 hover:text-gray-700 focus:outline-none transition">
+
+          <div className="hidden md:ml-6 md:flex md:items-center md:space-x-2">
+            <button onClick={toggleTheme} className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}>
+              {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+            </button>
+            <button onClick={handleLogout} className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
               <LogOut className="w-4 h-4 mr-2" />
-              Logout
+              <span className="hidden lg:inline">Logout</span>
             </button>
           </div>
 
           {/* Mobile menu button */}
-          <div className="flex items-center sm:hidden">
-            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+          <div className="flex items-center md:hidden space-x-2">
+            <button onClick={toggleTheme} className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+              {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+            </button>
+            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="inline-flex items-center justify-center p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
               <span className="sr-only">Open main menu</span>
               {isMobileMenuOpen ? <X className="block h-6 w-6" /> : <Menu className="block h-6 w-6" />}
             </button>
@@ -71,22 +90,18 @@ export function Navbar() {
       </div>
 
       {/* Mobile menu */}
-      {isMobileMenuOpen && <div className="sm:hidden bg-white border-b border-gray-200">
-          <div className="pt-2 pb-3 space-y-1">
-            {navItems.map(item => <Link key={item.path} to={item.path} onClick={() => setIsMobileMenuOpen(false)} className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${isActive(item.path) ? 'bg-blue-50 border-blue-500 text-blue-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'}`}>
-                <div className="flex items-center">
-                  <item.icon className="w-5 h-5 mr-3" />
-                  {item.name}
-                </div>
+      {isMobileMenuOpen && <div className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+          <div className="px-2 pt-2 pb-3 space-y-1">
+            {navItems.map(item => <Link key={item.path} to={item.path} onClick={() => setIsMobileMenuOpen(false)} className={`flex items-center px-3 py-2 rounded-lg text-base font-medium transition-colors ${isActive(item.path) ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>
+                <item.icon className="w-5 h-5 mr-3" />
+                {item.name}
               </Link>)}
             <button onClick={() => {
           handleLogout();
           setIsMobileMenuOpen(false);
-        }} className="w-full text-left block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700">
-              <div className="flex items-center">
-                <LogOut className="w-5 h-5 mr-3" />
-                Logout
-              </div>
+        }} className="w-full flex items-center px-3 py-2 rounded-lg text-base font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+              <LogOut className="w-5 h-5 mr-3" />
+              Logout
             </button>
           </div>
         </div>}
