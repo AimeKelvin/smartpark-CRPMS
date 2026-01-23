@@ -1,5 +1,5 @@
 import axios from 'axios';
-const API_URL = 'http://localhost:2026/api'; // Adjust based on backend URL
+const API_URL = 'https://smartpark-crpms.onrender.com/api'; // Adjust based on backend URL
 
 const client = axios.create({
   baseURL: API_URL,
