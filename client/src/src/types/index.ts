@@ -14,6 +14,7 @@ export interface Car {
   plateNumber: string; // matches Mongoose field
   type?: string;
   model?: string;
+  image?: string;
   year?: number;
   driverPhone?: string;
   mechanicName?: string;

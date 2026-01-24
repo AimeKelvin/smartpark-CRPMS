@@ -6,7 +6,8 @@ const carSchema = new mongoose.Schema({
   model: String,
   year: Number,
   driverPhone: String,
-  mechanicName: String
+  mechanicName: String,
+  image:  String
 }, { timestamps: true });
 
 export default mongoose.model('Car', carSchema);

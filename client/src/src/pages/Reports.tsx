@@ -88,19 +88,7 @@ export function Reports() {
             <Input label="Year" type="number" value={year} onChange={e => setYear(parseInt(e.target.value))} min="2000" max="2100" />
           </div>
 
-          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-100 dark:border-blue-800">
-            <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">
-              Report Contents
-            </h4>
-            <ul className="list-disc list-inside text-sm text-blue-700 dark:text-blue-300 space-y-1">
-              <li>Total revenue for the selected period</li>
-              <li>Breakdown of services performed</li>
-              <li>Payment status summary</li>
-              <li>Outstanding balances</li>
-            </ul>
-          </div>
-
-          <div className="flex justify-end pt-4 border-t border-gray-100 dark:border-gray-700">
+          <div className="flex justify-end pt-4 ">
             <Button onClick={handleDownload} isLoading={isLoading} className="w-full sm:w-auto">
               <Download className="w-4 h-4 mr-2" />
               Download PDF Report
