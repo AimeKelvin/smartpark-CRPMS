@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { login as loginApi } from '../api/auth';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
-import { AlertCircle } from 'lucide-react';
 import { useToast } from '../components/Toast';
 
 export function Login() {
@@ -38,36 +38,28 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8 transition-colors">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex justify-center">
-          <div className="h-14 w-14 rounded-xl flex items-center justify-center overflow-hidden">
-            <img
-              src="/512x512.png"
-              alt="CRPMS Logo"
-              className="h-80 w-80 object-contain"
-            />
-          </div>
-        </div>
+    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-white dark:bg-gray-900">
+      
+      {/* LEFT — FORM */}
+      <div className="flex items-center justify-center px-6 sm:px-10">
+        <div className="w-full max-w-md">
+         
 
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-          Sign in to CRPMS
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-          Car Repair Payment Management System
-        </p>
-      </div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Welcome back
+          </h1>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            Log in to your CRPMS account
+          </p>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0">
-        <div className="bg-white dark:bg-gray-800 py-8 px-4 shadow-xl shadow-gray-200/50 dark:shadow-none sm:rounded-xl sm:px-10 border border-gray-100 dark:border-gray-700 transition-colors">
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
             <Input
               label="Username"
               type="text"
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter your username"
+              placeholder="admin@example.com"
               autoComplete="username"
             />
 
@@ -77,47 +69,53 @@ export function Login() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
+              placeholder="••••••••"
               autoComplete="current-password"
             />
 
             {error && (
-              <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-4 border border-red-100 dark:border-red-800 flex items-start">
-                <AlertCircle className="h-5 w-5 text-red-500 dark:text-red-400 mt-0.5 mr-3 flex-shrink-0" />
-                <div className="text-sm text-red-700 dark:text-red-300">
-                  {error}
-                </div>
+              <div className="rounded-lg bg-red-50 p-4 border border-red-200 flex gap-3">
+                <AlertCircle className="h-5 w-5 text-red-500 mt-0.5" />
+                <p className="text-sm text-red-700">{error}</p>
               </div>
             )}
 
-            <div>
-              <Button
-                type="submit"
-                className="w-full justify-center py-2.5 text-sm font-semibold"
-                isLoading={isLoading}
-              >
-                Sign in
-              </Button>
-            </div>
+            <Button
+              type="submit"
+              className="w-full py-2.5 text-sm font-semibold"
+              isLoading={isLoading}
+            >
+              Sign In
+            </Button>
           </form>
 
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200 dark:border-gray-700" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
-                  Protected System
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-6 text-center text-xs text-gray-400 dark:text-gray-500">
-              &copy; {new Date().getFullYear()} CRPMS. All rights reserved.
-            </div>
-          </div>
+          <p className="mt-8 text-center text-xs text-gray-400">
+            © {new Date().getFullYear()} CRPMS. All rights reserved.
+          </p>
         </div>
+      </div>
+
+      <div className="hidden lg:block relative">
+        <img
+          src="/login.png" 
+          alt="Background"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+
+        <div className="absolute inset-0 bg-black/40" />
+<div className="relative z-10 flex h-full items-end p-10">
+  <blockquote className="max-w-md text-white">
+    <p className="text-lg font-medium leading-relaxed">
+      “Every great journey begins in the garage. From diagnostics to repairs
+      and payments, CRPMS keeps your workshop running smoothly and your
+      customers moving forward.”
+    </p>
+    <footer className="mt-4 text-sm opacity-80">
+      — SmartPark Management System
+    </footer>
+  </blockquote>
+</div>
+
       </div>
     </div>
   );
