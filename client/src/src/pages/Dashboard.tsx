@@ -72,15 +72,7 @@ export function Dashboard() {
     bgLight: 'bg-blue-50 dark:bg-blue-900/20',
     textColor: 'text-blue-600 dark:text-blue-400',
     description: 'Registered vehicles'
-  }, {
-    name: 'Monthly Revenue',
-    value: `$${stats.monthlyPayments.toLocaleString()}`,
-    icon: TrendingUp,
-    color: 'bg-green-600',
-    bgLight: 'bg-green-50 dark:bg-green-900/20',
-    textColor: 'text-green-600 dark:text-green-400',
-    description: 'Payments this month'
-  }, {
+  },  {
     name: 'Pending Records',
     value: stats.pendingRecords,
     icon: ClipboardList,

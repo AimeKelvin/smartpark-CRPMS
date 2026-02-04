@@ -43,11 +43,10 @@ export function Login() {
       {/* LEFT — FORM */}
       <div className="flex items-center justify-center px-6 sm:px-10">
         <div className="w-full max-w-md">
-         
-
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             Welcome back
           </h1>
+
           <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
             Log in to your CRPMS account
           </p>
@@ -95,27 +94,33 @@ export function Login() {
         </div>
       </div>
 
+      {/* RIGHT — IMAGE */}
       <div className="hidden lg:block relative">
         <img
-          src="/login.png" 
+          src="/login.png"
           alt="Background"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="
+            absolute inset-0 h-full w-full object-cover
+            grayscale brightness-75 contrast-110
+          "
         />
 
+        {/* Dark overlay */}
         <div className="absolute inset-0 bg-black/40" />
-<div className="relative z-10 flex h-full items-end p-10">
-  <blockquote className="max-w-md text-white">
-    <p className="text-lg font-medium leading-relaxed">
-      “Every great journey begins in the garage. From diagnostics to repairs
-      and payments, CRPMS keeps your workshop running smoothly and your
-      customers moving forward.”
-    </p>
-    <footer className="mt-4 text-sm opacity-80">
-      — SmartPark Management System
-    </footer>
-  </blockquote>
-</div>
 
+        {/* Quote */}
+        <div className="relative z-10 flex h-full items-end p-10">
+          <blockquote className="max-w-md text-white">
+            <p className="text-lg font-medium leading-relaxed">
+              “Every great journey begins in the garage. From diagnostics to
+              repairs and payments, CRPMS keeps your workshop running smoothly
+              and your customers moving forward.”
+            </p>
+            <footer className="mt-4 text-sm opacity-80">
+              — SmartPark Management System
+            </footer>
+          </blockquote>
+        </div>
       </div>
     </div>
   );
